@@ -1,27 +1,49 @@
 package sbu.cs.CalculatePi;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Scanner;
+import java.util.concurrent.*;
+
 public class PiCalculator {
-
-    /**
-     * Calculate pi and represent it as a BigDecimal object with the given floating point number (digits after . )
-     * There are several algorithms designed for calculating pi, it's up to you to decide which one to implement.
-     Experiment with different algorithms to find accurate results.
-
-     * You must design a multithreaded program to calculate pi. Creating a thread pool is recommended.
-     * Create as many classes and threads as you need.
-     * Your code must pass all of the test cases provided in the test folder.
-
-     * @param floatingPoint the exact number of digits after the floating point
-     * @return pi in string format (the string representation of the BigDecimal object)
-     */
-
-    public String calculate(int floatingPoint)
-    {
-        // TODO
-        return null;
+    public static BigDecimal ans=new BigDecimal("0.0");
+    public static class CalcPi implements Runnable{
+        @Override
+        public void run() {
+            for(int k=0;k<10000;k++){
+                BigDecimal sum=new BigDecimal("0.0");
+                sum=sum.add(BigDecimal.valueOf(1.0 * 4/(8*k+1)));
+                sum=sum.subtract(BigDecimal.valueOf(1.0 * 2/(8*k+4)));
+                sum=sum.subtract(BigDecimal.valueOf(1.0 * 1/(8*k+5)));
+                sum=sum.subtract(BigDecimal.valueOf(1.0 * 1/(8*k+6)));
+                sum=sum.divide(BigDecimal.valueOf(Math.pow(16,k)), 10000, RoundingMode.HALF_EVEN);
+                Add(sum);
+            }
+        }
+        public static synchronized void Add(BigDecimal num){
+            ans=ans.add(num);
+        }
+    }
+    public String calculate(int floatingPoint){
+        ExecutorService executor= Executors.newCachedThreadPool();
+        Thread task=new Thread(new CalcPi());
+        executor.execute(task);
+        executor.shutdown();
+        try {
+            executor.awaitTermination(10000, TimeUnit.MILLISECONDS);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        ans = ans.setScale(floatingPoint, RoundingMode.HALF_DOWN);
+        return ans.toString();
     }
 
-    public static void main(String[] args) {
-        // Use the main function to test the code yourself
+    public static void main(String[] args){
+        PiCalculator calc=new PiCalculator();
+        Scanner in = new Scanner(System.in);
+        int n=in.nextInt();
+        String ans=calc.calculate(n);
+        System.out.println(ans);
     }
 }
