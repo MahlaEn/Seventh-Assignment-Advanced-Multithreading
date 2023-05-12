@@ -5,12 +5,10 @@ import java.util.concurrent.CountDownLatch;
 public class BlackThread extends ColorThread {
 
     private static final String MESSAGE = "hi blues, hi whites!";
-    private static CountDownLatch blackCnt;
-    private static CountDownLatch blueCnt;
+    private CountDownLatch blackCnt;
 
-    public BlackThread(CountDownLatch blackCnt,CountDownLatch blueCnt) {
-        BlackThread.blackCnt = blackCnt;
-        BlackThread.blueCnt = blueCnt;
+    public BlackThread(CountDownLatch blackCnt) {
+        this.blackCnt = blackCnt;
     }
 
     void printMessage() {
@@ -24,16 +22,8 @@ public class BlackThread extends ColorThread {
 
     @Override
     public void run() {
-        try {
-            blackCnt.await();
-            printMessage();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            blueCnt.countDown();
-        }
+        printMessage();
+        blackCnt.countDown();
         // TODO call printMessage
     }
 }

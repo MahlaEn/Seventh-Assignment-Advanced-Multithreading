@@ -32,37 +32,36 @@ public class Runner {
      * @param blueCount     number of blue threads
      * @param whiteCount    number of white threads
      */
-    private static final CountDownLatch latch1=new CountDownLatch(1);
-    private static final CountDownLatch latch2 = new CountDownLatch(1);
-    private static final CountDownLatch latch3 = new CountDownLatch(1);
+
     public void run(int blackCount, int blueCount, int whiteCount) throws InterruptedException {
+        CountDownLatch latch1=new CountDownLatch(blackCount);
+        CountDownLatch latch2 = new CountDownLatch(blueCount);
+        CountDownLatch latch3 = new CountDownLatch(whiteCount);
+
         List<ColorThread> colorThreads = new ArrayList<>();
 
         // TODO
         for (int i = 0; i < blackCount; i++) {
-            BlackThread blackThread = new BlackThread(latch1,latch2);
+            BlackThread blackThread = new BlackThread(latch1);
             colorThreads.add(blackThread);
             blackThread.start();
         }
-        latch1.countDown();
+        latch1.await();
         // TODO
         for (int i = 0; i < blueCount; i++) {
-            BlueThread blueThread = new BlueThread(latch2,latch3);
+            BlueThread blueThread = new BlueThread(latch2);
             colorThreads.add(blueThread);
             blueThread.start();
         }
-        latch2.countDown();
+        latch2.await();
         // TODO
 
         for (int i = 0; i < whiteCount; i++) {
-            WhiteThread whiteThread = new WhiteThread();
+            WhiteThread whiteThread = new WhiteThread(latch3);
             colorThreads.add(whiteThread);
             whiteThread.start();
         }
-        latch3.countDown();
-        for (ColorThread thread : colorThreads) {
-            thread.join();
-        }
+        latch3.await();
 
         // TODO
     }

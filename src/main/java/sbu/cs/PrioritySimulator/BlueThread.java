@@ -7,12 +7,10 @@ public class BlueThread extends ColorThread {
     private static final String MESSAGE = "hi finished blacks, hi whites!";
 
 
-    private static CountDownLatch whiteCnt;
-    private static CountDownLatch blueCnt;
+    private CountDownLatch blueCnt;
 
-    public BlueThread(CountDownLatch blueCnt, CountDownLatch whiteCnt) {
-        BlueThread.whiteCnt = whiteCnt;
-        BlueThread.blueCnt = blueCnt;
+    public BlueThread(CountDownLatch blueCnt) {
+        this.blueCnt = blueCnt;
     }
 
     void printMessage() {
@@ -26,16 +24,8 @@ public class BlueThread extends ColorThread {
 
     @Override
     public void run() {
-        try {
-            blueCnt.await();
-            printMessage();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            whiteCnt.countDown();
-        }
+        printMessage();
+        blueCnt.countDown();
         // TODO call printMessage
     }
 }
