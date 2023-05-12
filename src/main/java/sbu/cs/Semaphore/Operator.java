@@ -1,21 +1,30 @@
 package sbu.cs.Semaphore;
 
-public class Operator extends Thread {
+import java.sql.Date;
+import java.util.concurrent.Semaphore;
 
-    public Operator(String name) {
+public class Operator extends Thread {
+    Semaphore lock;
+    public Operator(String name,Semaphore lock) {
         super(name);
+        this.lock=lock;
     }
 
     @Override
     public void run() {
         for (int i = 0; i < 10; i++)
         {
-            Resource.accessResource();         // critical section - a Maximum of 2 operators can access the resource concurrently
-            try {
+            try{
+                lock.acquire();
+                System.out.println(this.getName()+" started...");
+                Resource.accessResource();         // critical section - a Maximum of 2 operators can access the resource concurrently
                 sleep(500);
-            } catch (InterruptedException e) {
+            }
+            catch (Exception e){
                 e.printStackTrace();
             }
+            System.out.println(this.getName()+" done .");
+            lock.release();
         }
     }
 }
